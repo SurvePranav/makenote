@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "968137639156",
+    "project_id": "makenote-flutter-project-de4c0",
+    "storage_bucket": "makenote-flutter-project-de4c0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:968137639156:android:372af3fb9aea979f8f0aa1",
+        "android_client_info": {
+          "package_name": "com.notemaker.makenote"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "968137639156-uuo58fskchjpt9ta6f92rrplp9f31dg8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6GgqjoDDdDkCH-S101zKh823zwP-SvZ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "968137639156-uuo58fskchjpt9ta6f92rrplp9f31dg8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
