@@ -63,6 +63,7 @@ class _NewNotesViewState extends State<NewNotesView> {
 
   @override
   void dispose() {
+    _textController.removeListener(_textControllerListener);
     _deleteNoteIfTextIsEmpty();
     _saveNoteIfTextIsNotEmpty();
     _textController.dispose();

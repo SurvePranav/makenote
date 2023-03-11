@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:makenote/constants/routes.dart';
 import 'package:makenote/services/auth/auth_service.dart';
 import 'package:makenote/services/crud/notes_service.dart';
+import 'package:makenote/utilities/dialogs/logout_dialog.dart';
+import 'package:makenote/views/notes/notes_list_view.dart';
 import '../../enums/menu_action.dart';
 
 class NotesView extends StatefulWidget {
@@ -72,74 +74,10 @@ class _NotesViewState extends State<NotesView> {
                             if (snapshot.hasData) {
                               final allNotes =
                                   snapshot.data as List<DatabaseNote>;
-                              return ListView.builder(
-                                itemCount: allNotes.length,
-                                itemBuilder: (context, index) {
-                                  // if (snapshot.data?.isEmpty ?? false) {
-                                  //   return Center(
-                                  //     child: Padding(
-                                  //       padding:
-                                  //           const EdgeInsets.only(top: 350.0),
-                                  //       child: Column(
-                                  //         children: [
-                                  //           Padding(
-                                  //             padding:
-                                  //                 const EdgeInsets.all(8.0),
-                                  //             child: SizedBox(
-                                  //               width: 100,
-                                  //               height: 100,
-                                  //               child: ElevatedButton(
-                                  //                 style:
-                                  //                     ElevatedButton.styleFrom(
-                                  //                   shape: const CircleBorder(),
-                                  //                 ),
-                                  //                 onPressed: () {
-                                  //                   Navigator.of(context)
-                                  //                       .pushNamed(
-                                  //                           newNotesRoute);
-                                  //                 },
-                                  //                 child: const Icon(Icons.add),
-                                  //               ),
-                                  //             ),
-                                  //           ),
-                                  //           const Text(
-                                  //             "Create Your First Note",
-                                  //             style: TextStyle(
-                                  //               color: Colors.deepPurple,
-                                  //               fontSize: 20.0,
-                                  //             ),
-                                  //           ),
-                                  //         ],
-                                  //       ),
-                                  //     ),
-                                  //   );
-                                  // } else {
-                                  final note = allNotes[index];
-                                  print(allNotes);
-                                  return Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 10.0,
-                                      left: 10.0,
-                                      right: 10.0,
-                                    ),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.deepPurple,
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                      ),
-                                      child: ListTile(
-                                        title: Text(
-                                          note.text,
-                                          maxLines: 1,
-                                          softWrap: true,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  );
+                              return NotesListView(
+                                notes: allNotes,
+                                onDeleteNote: (note) async {
+                                  await _notesServices.deleteNote(id: note.id);
                                 },
                               );
                             } else {
@@ -154,31 +92,4 @@ class _NotesViewState extends State<NotesView> {
               }
             }));
   }
-}
-
-Future<bool> showLogOutDialog(BuildContext context) {
-  return showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop(false);
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop(true);
-              await AuthService.firebase().logOut();
-            },
-            child: const Text('Yes'),
-          ),
-        ],
-      );
-    },
-  ).then((value) => value ?? false);
 }
