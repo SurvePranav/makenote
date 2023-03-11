@@ -12,13 +12,21 @@ class NotesServices {
   List<DatabaseNote> _notes = [];
 
   // Creating shared instance for Notes Services that means only one instance of this class will be shared among all instances.
-  NotesServices._sharedInstance(); //  Private constructor
   static final NotesServices _shared = NotesServices
       ._sharedInstance(); // private single instace from private constructor
+
+  NotesServices._sharedInstance() {
+    _noteStreamController = StreamController<List<DatabaseNote>>.broadcast(
+      onListen: () {
+        _noteStreamController.sink.add(
+            _notes); // to populate all the streams whenever the new listener is added to the stream
+      },
+    );
+  } //  Private constructor
+
   factory NotesServices() => _shared; // exposing single instance
 
-  final _noteStreamController =
-      StreamController<List<DatabaseNote>>.broadcast();
+  late final StreamController<List<DatabaseNote>> _noteStreamController;
 
   Stream<List<DatabaseNote>> get allNotes => _noteStreamController.stream;
 
@@ -308,7 +316,7 @@ const emailColumn = 'email';
 const userIdColumn = 'user_id';
 const textColumn = 'text';
 const isSyncedWithCloudColumn = 'is_synced_with_cloud';
-const createNoteTable = '''CREATE TABLE IF NOT EXIST "note" (
+const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
       "id"	INTEGER NOT NULL,
       "user_id"	INTEGER NOT NULL,
       "text"	TEXT,
@@ -317,7 +325,7 @@ const createNoteTable = '''CREATE TABLE IF NOT EXIST "note" (
       FOREIGN KEY("user_id") REFERENCES "user"("id")
       );''';
 
-const createUserTable = '''CREATE TABLE IF NOT EXIST "user" (
+const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
 "id"	INTEGER NOT NULL,
 "email"	TEXT NOT NULL UNIQUE,
 PRIMARY KEY("id" AUTOINCREMENT)

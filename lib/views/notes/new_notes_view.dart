@@ -46,10 +46,10 @@ class _NewNotesViewState extends State<NewNotesView> {
     return await _notesServices.createNote(owner: owner);
   }
 
-  void _deleteNoteIfTextIsEmpty() async {
+  void _deleteNoteIfTextIsEmpty() {
     final note = _note;
     if (_textController.text.isEmpty && note != null) {
-      await _notesServices.deleteNote(id: note.id);
+      _notesServices.deleteNote(id: note.id);
     }
   }
 
@@ -81,7 +81,7 @@ class _NewNotesViewState extends State<NewNotesView> {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
               // ignore: unnecessary_cast
-              _note = snapshot.data as DatabaseNote?;
+              _note = snapshot.data as DatabaseNote;
               _setUpTextControllerListener();
               return TextField(
                 controller: _textController,

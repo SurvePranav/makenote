@@ -18,14 +18,7 @@ class _NotesViewState extends State<NotesView> {
   @override
   void initState() {
     _notesServices = NotesServices();
-    _notesServices.open();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _notesServices.close();
-    super.dispose();
   }
 
   @override
@@ -71,16 +64,91 @@ class _NotesViewState extends State<NotesView> {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
                   return StreamBuilder(
-                    stream: _notesServices.allNotes,
-                    builder: (context, snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.waiting:
-                          return const Text("waiting for all the notes....");
-                        default:
-                          return const CircularProgressIndicator();
-                      }
-                    },
-                  );
+                      stream: _notesServices.allNotes,
+                      builder: (context, snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.waiting:
+                          case ConnectionState.active:
+                            if (snapshot.hasData) {
+                              final allNotes =
+                                  snapshot.data as List<DatabaseNote>;
+                              return ListView.builder(
+                                itemCount: allNotes.length,
+                                itemBuilder: (context, index) {
+                                  // if (snapshot.data?.isEmpty ?? false) {
+                                  //   return Center(
+                                  //     child: Padding(
+                                  //       padding:
+                                  //           const EdgeInsets.only(top: 350.0),
+                                  //       child: Column(
+                                  //         children: [
+                                  //           Padding(
+                                  //             padding:
+                                  //                 const EdgeInsets.all(8.0),
+                                  //             child: SizedBox(
+                                  //               width: 100,
+                                  //               height: 100,
+                                  //               child: ElevatedButton(
+                                  //                 style:
+                                  //                     ElevatedButton.styleFrom(
+                                  //                   shape: const CircleBorder(),
+                                  //                 ),
+                                  //                 onPressed: () {
+                                  //                   Navigator.of(context)
+                                  //                       .pushNamed(
+                                  //                           newNotesRoute);
+                                  //                 },
+                                  //                 child: const Icon(Icons.add),
+                                  //               ),
+                                  //             ),
+                                  //           ),
+                                  //           const Text(
+                                  //             "Create Your First Note",
+                                  //             style: TextStyle(
+                                  //               color: Colors.deepPurple,
+                                  //               fontSize: 20.0,
+                                  //             ),
+                                  //           ),
+                                  //         ],
+                                  //       ),
+                                  //     ),
+                                  //   );
+                                  // } else {
+                                  final note = allNotes[index];
+                                  print(allNotes);
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 10.0,
+                                      left: 10.0,
+                                      right: 10.0,
+                                    ),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.deepPurple,
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                      ),
+                                      child: ListTile(
+                                        title: Text(
+                                          note.text,
+                                          maxLines: 1,
+                                          softWrap: true,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            } else {
+                              return const CircularProgressIndicator();
+                            }
+                          default:
+                            return const CircularProgressIndicator();
+                        }
+                      });
                 default:
                   return const CircularProgressIndicator();
               }
