@@ -4,15 +4,17 @@ import 'package:makenote/utilities/dialogs/delete_dialog.dart';
 
 import '../../constants/routes.dart';
 
-typedef DeleteNoteCallBack = Function(DatabaseNote note);
+typedef NoteCallBack = Function(DatabaseNote note);
 
 class NotesListView extends StatelessWidget {
   final List<DatabaseNote> notes;
-  final DeleteNoteCallBack onDeleteNote;
+  final NoteCallBack onDeleteNote;
+  final NoteCallBack onTap;
   const NotesListView({
     super.key,
     required this.notes,
     required this.onDeleteNote,
+    required this.onTap,
   });
 
   @override
@@ -33,7 +35,7 @@ class NotesListView extends StatelessWidget {
                       shape: const CircleBorder(),
                     ),
                     onPressed: () {
-                      Navigator.of(context).pushNamed(newNotesRoute);
+                      Navigator.of(context).pushNamed(createAndUpdateNoteRout);
                     },
                     child: const Icon(Icons.add),
                   ),
@@ -84,6 +86,9 @@ class NotesListView extends StatelessWidget {
                     }
                   },
                 ),
+                onTap: () {
+                  onTap(note);
+                },
               ),
             ),
           );
