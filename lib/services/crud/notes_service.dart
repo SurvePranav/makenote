@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:makenote/extensions/lists/filter.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
@@ -8,6 +9,7 @@ import 'package:makenote/services/crud/crud_exceptions.dart';
 
 class NotesServices {
   Database? _db;
+  DatabaseUser? _user;
 
   List<DatabaseNote> _notes = [];
 
@@ -28,14 +30,33 @@ class NotesServices {
 
   late final StreamController<List<DatabaseNote>> _noteStreamController;
 
-  Stream<List<DatabaseNote>> get allNotes => _noteStreamController.stream;
+  Stream<List<DatabaseNote>> get allNotes =>
+      _noteStreamController.stream.filter(
+        (note) {
+          final currentUser = _user;
+          if (currentUser != null) {
+            return note.userId == currentUser.id;
+          } else {
+            throw UserShouldBeSetBeforeCreatingNote();
+          }
+        },
+      );
 
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    setAsCurrentUser = true,
+  }) async {
     try {
       final user = await getUser(email: email);
+      if (setAsCurrentUser) {
+        _user = user;
+      }
       return user;
     } on CouldNotFindUser {
       final createdUser = await createUser(email: email);
+      if (setAsCurrentUser) {
+        _user = createdUser;
+      }
       return createdUser;
     } catch (e) {
       rethrow;
@@ -54,10 +75,15 @@ class NotesServices {
     final db = _getDatabaseOrThrow();
     await getNote(id: note.id);
 
-    final noteCount = await db.update(noteTable, {
-      textColumn: text,
-      isSyncedWithCloudColumn: 0,
-    });
+    final noteCount = await db.update(
+      noteTable,
+      {
+        textColumn: text,
+        isSyncedWithCloudColumn: 0,
+      },
+      where: 'id =?',
+      whereArgs: [note.id],
+    );
 
     if (noteCount == 0) {
       throw CouldNotUpdateNote();
