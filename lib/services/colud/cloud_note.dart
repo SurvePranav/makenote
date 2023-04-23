@@ -5,7 +5,7 @@ class CloudNote {
   final String documentId;
   final String ownerUserId;
   final String text;
-  final String? title;
+  final String title;
   final String modifiedDate;
 
   CloudNote({

@@ -49,14 +49,7 @@ class FirebaseCloudStorage {
           .get()
           .then(
             (value) => value.docs.map(
-              (doc) {
-                return CloudNote(
-                    documentId: doc.id,
-                    ownerUserId: doc.data()[ownerUserId] as String,
-                    text: doc.data()[textFieldName] as String,
-                    title: doc.data()[titleFieldName] as String,
-                    modifiedDate: doc.data()[modifiedDateFieldName] as String);
-              },
+              (doc) => CloudNote.fromSnapshot(doc),
             ),
           );
     } catch (e) {
@@ -64,11 +57,25 @@ class FirebaseCloudStorage {
     }
   }
 
-  void createNewNote({required String ownerUserId}) async {
-    await notes.add({
+  Future<CloudNote> createNewNote(
+      {required String ownerUserId,
+      required String text,
+      required String title,
+      required String modifiedDate}) async {
+    final document = await notes.add({
       ownerUserIdFieldName: ownerUserId,
       textFieldName: "",
+      titleFieldName: "",
+      modifiedDateFieldName: "",
     });
+
+    final fetchedNote = await document.get();
+    return CloudNote(
+        ownerUserId: ownerUserId,
+        documentId: fetchedNote.id,
+        text: "",
+        title: "",
+        modifiedDate: "");
   }
 
   static final FirebaseCloudStorage _shared =

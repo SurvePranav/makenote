@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:makenote/services/crud/notes_service.dart';
+import 'package:makenote/services/colud/cloud_note.dart';
 import 'package:makenote/utilities/dialogs/delete_dialog.dart';
 import '../../constants/routes.dart';
 import 'package:intl/intl.dart';
 
-typedef NoteCallBack = Function(DatabaseNote note);
+typedef NoteCallBack = Function(CloudNote note);
 
 class NotesListView extends StatelessWidget {
-  final List<DatabaseNote> notes;
+  final Iterable<CloudNote> notes;
   final NoteCallBack onDeleteNote;
   final NoteCallBack onTap;
   const NotesListView({
@@ -76,7 +76,7 @@ class NotesListView extends StatelessWidget {
       return ListView.builder(
         itemCount: notes.length,
         itemBuilder: (context, index) {
-          final note = notes[notes.length - 1 - index];
+          final note = notes.elementAt(index);
           return Padding(
             padding: const EdgeInsets.only(
               top: 10.0,
@@ -92,7 +92,7 @@ class NotesListView extends StatelessWidget {
               color: Colors.black,
               child: ListTile(
                 leading: Hero(
-                  tag: note.id,
+                  tag: note.documentId,
                   child: Container(
                     width: 45,
                     height: 45,
