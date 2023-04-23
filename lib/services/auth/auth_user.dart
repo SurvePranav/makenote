@@ -3,10 +3,18 @@ import 'package:flutter/cupertino.dart';
 
 @immutable
 class AuthUser implements Exception {
-  final String? email;
+  final String id;
+  final String email;
   final bool isEmailVerified;
 
-  const AuthUser({required this.email, required this.isEmailVerified});
-  factory AuthUser.fromFirebase(User user) =>
-      AuthUser(email: user.email, isEmailVerified: user.emailVerified);
+  const AuthUser({
+    required this.id,
+    required this.email,
+    required this.isEmailVerified,
+  });
+  factory AuthUser.fromFirebase(User user) => AuthUser(
+        id: user.uid,
+        email: user.email!,
+        isEmailVerified: user.emailVerified,
+      );
 }

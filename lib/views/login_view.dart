@@ -1,8 +1,10 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:makenote/constants/routes.dart';
 import 'package:makenote/services/auth/auth_exceptions.dart';
 import 'package:makenote/services/auth/auth_service.dart';
 import 'package:makenote/utilities/dialogs/error_dialog.dart';
+import 'package:makenote/views/register_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -17,6 +19,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   void initState() {
+    _setLoginText();
     _email = TextEditingController();
     _password = TextEditingController();
     super.initState();
@@ -29,81 +32,172 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
+  Widget _myChild = const Text(
+    'Login',
+    style: TextStyle(
+      fontSize: 20,
+    ),
+  );
+  void _setLoginText() {
+    setState(() {
+      _myChild = const Text(
+        'Login',
+        style: TextStyle(
+          fontSize: 20,
+        ),
+      );
+    });
+  }
+
+  void _setLoadingCircle() {
+    setState(() {
+      _myChild = const CircularProgressIndicator(
+        color: Colors.black,
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: Column(
-        children: [
-          TextField(
-            controller: _email,
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              hintText: 'Enter your email',
+      body: Container(
+        margin: const EdgeInsets.only(top: 125, left: 20, right: 20),
+        height: 500,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.orange,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.grey,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 8.0,
+                right: 8.0,
+                top: 14.0,
+              ),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _email,
+                    autocorrect: false,
+                    style: const TextStyle(color: Colors.black),
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter your email',
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15),
+                    child: TextField(
+                      controller: _password,
+                      obscureText: true,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      style: const TextStyle(color: Colors.black),
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your password',
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30.0, bottom: 20),
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final email = _email.text;
+                          final password = _password.text;
+
+                          _setLoadingCircle();
+                          try {
+                            await AuthService.firebase().logIn(
+                              email: email,
+                              password: password,
+                            );
+                            final user = AuthService.firebase().currentUser;
+                            if (user?.isEmailVerified ?? false) {
+                              _setLoginText();
+                              // user email is verified
+                              if (context.mounted) {
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                  notesRoute,
+                                  (route) => false,
+                                );
+                              }
+                            } else {
+                              _setLoginText();
+                              // user email is not verified
+                              if (context.mounted) {
+                                Navigator.of(context).pushNamed(
+                                  verifyRoute,
+                                  // (route) => false,
+                                );
+                              }
+                            }
+                          } on UserNotFoundAuthException {
+                            _setLoginText();
+                            await showErrorDialog(
+                              context,
+                              'User Not Found',
+                            );
+                          } on WrongPasswordAuthException {
+                            _setLoginText();
+                            await showErrorDialog(
+                              context,
+                              'Wrong Password',
+                            );
+                          } on GenericAuthException {
+                            _setLoginText();
+                            await showErrorDialog(
+                              context,
+                              'Authentication Error',
+                            );
+                          }
+                        },
+                        child: _myChild,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Not registered yet?',
+                          style: TextStyle(fontSize: 18, color: Colors.black),
+                        ),
+                        OpenContainer(
+                          closedColor: Colors.transparent,
+                          transitionDuration: const Duration(milliseconds: 500),
+                          openBuilder: (context, action) =>
+                              const RegisterView(),
+                          closedBuilder: (context, action) => TextButton(
+                            onPressed: action,
+                            child: const Text(
+                              'Register here',
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-          TextField(
-            controller: _password,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              hintText: 'Enter your password',
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                await AuthService.firebase().logIn(
-                  email: email,
-                  password: password,
-                );
-                final user = AuthService.firebase().currentUser;
-                if (user?.isEmailVerified ?? false) {
-                  // user email is verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    notesRoute,
-                    (route) => false,
-                  );
-                } else {
-                  // user email is not verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    verifyRoute,
-                    (route) => false,
-                  );
-                }
-              } on UserNotFoundAuthException {
-                await showErrorDialog(
-                  context,
-                  'User Not Found',
-                );
-              } on WrongPasswordAuthException {
-                await showErrorDialog(
-                  context,
-                  'Wrong Password',
-                );
-              } on GenericAuthException {
-                await showErrorDialog(
-                  context,
-                  'Authentication Error',
-                );
-              }
-            },
-            child: const Text('Login'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, registerRoute, (route) => false);
-            },
-            child: const Text('Not Registered Yet? Register here'),
-          )
-        ],
+        ),
       ),
     );
   }

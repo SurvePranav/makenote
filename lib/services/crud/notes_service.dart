@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:makenote/extensions/lists/filter.dart';
 import 'package:sqflite/sqflite.dart';
@@ -69,8 +68,12 @@ class NotesServices {
     _noteStreamController.add(_notes);
   }
 
-  Future<DatabaseNote> updateNote(
-      {required DatabaseNote note, required String text}) async {
+  Future<DatabaseNote> updateNote({
+    required DatabaseNote note,
+    required String text,
+    required String date,
+    required String title,
+  }) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     await getNote(id: note.id);
@@ -78,7 +81,9 @@ class NotesServices {
     final noteCount = await db.update(
       noteTable,
       {
+        titleColumn: title,
         textColumn: text,
+        modifiedDateColumn: date,
         isSyncedWithCloudColumn: 0,
       },
       where: 'id =?',
@@ -158,17 +163,23 @@ class NotesServices {
     }
 
     // inserting note into notetable
+    String date = DateTime.now().toString();
     const text = '';
+    const title = '';
     final noteId = await db.insert(noteTable, {
       userIdColumn: owner.id,
+      titleColumn: title,
       textColumn: text,
+      modifiedDateColumn: date,
       isSyncedWithCloudColumn: 1,
     });
 
     final note = DatabaseNote(
       id: noteId,
       userId: owner.id,
+      title: title,
       text: text,
+      modifiedDate: date,
       isSyncedWithCloud: true,
     );
     _notes.add(note);
@@ -307,25 +318,31 @@ class DatabaseUser {
 class DatabaseNote {
   final int id;
   final int userId;
+  final String title;
   final String text;
+  final String modifiedDate;
   final bool isSyncedWithCloud;
 
   DatabaseNote({
     required this.id,
     required this.userId,
+    required this.title,
     required this.text,
+    required this.modifiedDate,
     required this.isSyncedWithCloud,
   });
   DatabaseNote.fromRow(Map<String, Object?> map)
       : id = map[idColumn] as int,
         userId = map[userIdColumn] as int,
+        title = map[titleColumn] as String,
         text = map[textColumn] as String,
+        modifiedDate = map[modifiedDateColumn] as String,
         isSyncedWithCloud =
             (map[isSyncedWithCloudColumn] as int) == 1 ? true : false;
 
   @override
   String toString() =>
-      'Person, id=$id, user_id=$userId, is_synced=$isSyncedWithCloud, text=$text';
+      'Person, id=$id, user_id=$userId, is_synced=$isSyncedWithCloud,title=$title ,text=$text, date=$modifiedDate';
 
   @override
   bool operator ==(covariant DatabaseNote other) => id == other.id;
@@ -340,12 +357,17 @@ const userTable = 'user';
 const idColumn = 'id';
 const emailColumn = 'email';
 const userIdColumn = 'user_id';
+const titleColumn = "title";
 const textColumn = 'text';
+String modifiedDateColumn = 'modified_date';
+
 const isSyncedWithCloudColumn = 'is_synced_with_cloud';
 const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
       "id"	INTEGER NOT NULL,
       "user_id"	INTEGER NOT NULL,
+      "title" TEXT,
       "text"	TEXT,
+      "modified_date" TEXT,
       "is_synced_with_cloud"	INTEGER NOT NULL DEFAULT 0,
       PRIMARY KEY("id" AUTOINCREMENT),
       FOREIGN KEY("user_id") REFERENCES "user"("id")

@@ -32,71 +32,130 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Register'),
       ),
-      body: Column(
-        children: [
-          TextField(
-            controller: _email,
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              hintText: 'Enter your email',
+      body: Padding(
+        padding: const EdgeInsets.only(top: 125, left: 20, right: 20),
+        child: Container(
+          height: 500,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.orange,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20), color: Colors.grey),
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 8.0,
+                  right: 8.0,
+                  top: 14.0,
+                ),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _email,
+                      autocorrect: false,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your email',
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15.0),
+                      child: TextField(
+                        controller: _password,
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        decoration: const InputDecoration(
+                          hintText: 'Create strong password',
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 30.0, bottom: 20),
+                      child: SizedBox(
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final email = _email.text;
+                            final password = _password.text;
+                            try {
+                              await AuthService.firebase().createUser(
+                                email: email,
+                                password: password,
+                              );
+                              await AuthService.firebase()
+                                  .sendVerificationLink();
+                              if (context.mounted) {
+                                Navigator.of(context).pushNamed(verifyRoute);
+                              }
+                            } on WeakPasswordAuthException {
+                              await showErrorDialog(
+                                context,
+                                'password is too weak',
+                              );
+                            } on EmailAlreadyInUseAuthException {
+                              await showErrorDialog(
+                                context,
+                                'Email is already used by another user',
+                              );
+                            } on InvalidEmailAuthException {
+                              await showErrorDialog(
+                                context,
+                                'You entered invalid email id',
+                              );
+                            } on GenericAuthException {
+                              await showErrorDialog(
+                                context,
+                                'Failed To Register',
+                              );
+                            }
+                          },
+                          child: const Text(
+                            'Register',
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 25.0),
+                      child: Row(
+                        children: [
+                          const Text(
+                            'Already registered?',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, loginRoute, (route) => false);
+                            },
+                            child: const Text(
+                              'Login Here!',
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
             ),
           ),
-          TextField(
-            controller: _password,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              hintText: 'Enter your password',
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                await AuthService.firebase().createUser(
-                  email: email,
-                  password: password,
-                );
-                await AuthService.firebase().sendVerificationLink();
-                Navigator.of(context).pushNamed(verifyRoute);
-              } on WeakPasswordAuthException {
-                await showErrorDialog(
-                  context,
-                  'password is too weak',
-                );
-              } on EmailAlreadyInUseAuthException {
-                await showErrorDialog(
-                  context,
-                  'Email is already used by another user',
-                );
-              } on InvalidEmailAuthException {
-                await showErrorDialog(
-                  context,
-                  'You entered invalid email id',
-                );
-              } on GenericAuthException {
-                await showErrorDialog(
-                  context,
-                  'Failed To Register',
-                );
-              }
-            },
-            child: const Text('Register'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, loginRoute, (route) => false);
-            },
-            child: const Text('Already Registered? Login Here!'),
-          )
-        ],
+        ),
       ),
     );
   }

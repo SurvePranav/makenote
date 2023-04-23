@@ -14,7 +14,7 @@ void main() {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        primarySwatch: Colors.orange,
       ),
       home: const HomePage(),
       routes: {

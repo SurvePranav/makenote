@@ -12,11 +12,12 @@ Future<T?> showGenericDialog<T>(
     context: context,
     builder: (context) {
       return AlertDialog(
+        backgroundColor: Colors.grey,
         title: Text(title),
         content: Text(content),
         actions: options.keys.map((optionTitle) {
           final T value = options[optionTitle];
-          return TextButton(
+          return ElevatedButton(
             onPressed: () {
               if (value != null) {
                 Navigator.of(context).pop(value);
