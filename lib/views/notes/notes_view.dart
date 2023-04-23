@@ -80,9 +80,26 @@ class _NotesViewState extends State<NotesView> {
               case ConnectionState.waiting:
               case ConnectionState.active:
                 if (snapshot.hasData) {
+                  Iterable<CloudNote> sortNotes(List<CloudNote> notes) {
+                    for (int i = 0; i < notes.length; i++) {
+                      for (int j = i; j < notes.length; j++) {
+                        DateTime dt1 = DateTime.parse(notes[i].modifiedDate);
+                        DateTime dt2 = DateTime.parse(notes[j].modifiedDate);
+                        if (dt1.compareTo(dt2) < 0) {
+                          CloudNote cpy = notes[i];
+                          notes[i] = notes[j];
+                          notes[j] = cpy;
+                        }
+                      }
+                    }
+                    Iterable<CloudNote> sortedNotes = notes;
+                    return sortedNotes;
+                  }
+
                   final allNotes = snapshot.data as Iterable<CloudNote>;
+                  final allSortedNotes = sortNotes(allNotes.toList());
                   return NotesListView(
-                    notes: allNotes,
+                    notes: allSortedNotes,
                     onDeleteNote: (note) async {
                       await _notesServices.deleteNote(
                           documentId: note.documentId);

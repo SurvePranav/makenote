@@ -105,13 +105,14 @@ class NotesListView extends StatelessWidget {
                       color: Colors.grey,
                     ),
                     child: Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: Text(
-                          note.text,
-                          style: const TextStyle(
-                            fontSize: 7,
-                          ),
-                        )),
+                      padding: const EdgeInsets.all(2),
+                      child: Text(
+                        note.text,
+                        style: const TextStyle(
+                          fontSize: 7,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 title: Text(

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:makenote/services/auth/auth_service.dart';
 import 'package:makenote/services/colud/firebase_cloud_storage.dart';
+import 'package:makenote/utilities/dialogs/empty_note_dialog.dart';
 import 'package:makenote/utilities/generics/get_arguments.dart';
 import "package:makenote/services/colud/cloud_note.dart";
 import "package:makenote/services/colud/cloud_services_exceptions.dart";
 import "package:makenote/services/colud/cloud_storage_constants.dart";
+import 'package:share_plus/share_plus.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {
   const CreateUpdateNoteView({super.key});
@@ -130,43 +132,72 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
             }
           },
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              final text = _textController.text;
+              if (_note == null || text == "") {
+                cannotShareEmptyNoteDialog(context, "Cannot share empty note");
+              } else {
+                Share.share(text);
+              }
+            },
+            icon: const Icon(Icons.share),
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width / 25,
+          )
+        ],
       ),
       body: FutureBuilder(
         future: createOrGetExistingNote(context),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
+              return Hero(
+                tag: _note?.documentId ?? 'newNote',
+                flightShuttleBuilder: (flightContext, animation, direction,
+                    fromContext, toContext) {
+                  return Container(
+                    width: 45,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1,
+                        color: Colors.orange,
+                      ),
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      color: Colors.grey,
+                    ),
+                  );
+                },
                 child: Container(
+                  margin: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.grey),
                   child: Padding(
                     padding: const EdgeInsets.all(15.0),
-                    child: Hero(
-                      tag: _note?.documentId ?? 'newNote',
-                      child: TextField(
-                        controller: _textController,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        decoration: const InputDecoration(
-                          hintText: 'Start typing your note..',
-                        ),
-                        style: const TextStyle(fontSize: 20),
-                        onChanged: (value) {
-                          if (_isFirstTime) {
-                            if (_note == null) {
-                              createNewNote();
-                            }
-                            _setUpTextControllerListener();
-                            _isFirstTime = false;
-                            _isTextControllerSettedUp = true;
-                          }
-                        },
-                        onTapOutside: (event) =>
-                            FocusManager.instance.primaryFocus?.unfocus(),
+                    child: TextField(
+                      controller: _textController,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        hintText: 'Start typing your note..',
                       ),
+                      style: const TextStyle(fontSize: 20),
+                      onChanged: (value) {
+                        if (_isFirstTime) {
+                          if (_note == null) {
+                            createNewNote();
+                          }
+                          _setUpTextControllerListener();
+                          _isFirstTime = false;
+                          _isTextControllerSettedUp = true;
+                        }
+                      },
+                      onTapOutside: (event) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
                     ),
                   ),
                 ),
