@@ -57,16 +57,14 @@ class FirebaseCloudStorage {
     }
   }
 
-  Future<CloudNote> createNewNote(
-      {required String ownerUserId,
-      required String text,
-      required String title,
-      required String modifiedDate}) async {
+  Future<CloudNote> createNewNote({
+    required String ownerUserId,
+  }) async {
     final document = await notes.add({
       ownerUserIdFieldName: ownerUserId,
       textFieldName: "",
       titleFieldName: "",
-      modifiedDateFieldName: "",
+      modifiedDateFieldName: DateTime.now().toString(),
     });
 
     final fetchedNote = await document.get();

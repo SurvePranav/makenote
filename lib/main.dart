@@ -14,9 +14,23 @@ void main() {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.orange,
+        colorSchemeSeed: Colors.grey,
+        textSelectionTheme: const TextSelectionThemeData(
+          selectionColor: Colors.grey,
+        ),
+        scaffoldBackgroundColor: Colors.grey,
+        appBarTheme: const AppBarTheme(
+          color: Colors.grey, // Background color of AppBar
+          elevation: 0.0, // Shadow the AppBar casts
+          iconTheme: IconThemeData(
+            color: Colors.black,
+          ), // Color of icons in AppBar
+          // You can add more properties as needed
+        ),
       ),
+
       home: const HomePage(),
+      // home: const TestingPage(),
       routes: {
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
