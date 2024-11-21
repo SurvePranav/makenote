@@ -256,12 +256,19 @@ class NotesListView extends StatelessWidget {
             ),
           );
         },
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // Number of columns
-            crossAxisSpacing: 4.0, // Horizontal space between items
-            mainAxisSpacing: 4.0, // Vertical space between items
-            childAspectRatio: (30 / 40) // child aspect ratio
-            ),
+        gridDelegate: MediaQuery.of(context).size.width > 700
+            ? const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4, // Number of columns
+                crossAxisSpacing: 4.0, // Horizontal space between items
+                mainAxisSpacing: 4.0, // Vertical space between items
+                childAspectRatio: (30 / 40) // child aspect ratio
+                )
+            : const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Number of columns
+                crossAxisSpacing: 4.0, // Horizontal space between items
+                mainAxisSpacing: 4.0, // Vertical space between items
+                childAspectRatio: (30 / 40) // child aspect ratio
+                ),
       );
     }
   }

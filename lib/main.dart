@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:makenote/constants/routes.dart';
 import 'package:makenote/services/auth/auth_service.dart';
 import 'package:makenote/views/notes/create_update_note_view.dart';
@@ -7,8 +8,9 @@ import 'package:makenote/views/register_view.dart';
 import 'package:makenote/views/verify_email_view.dart';
 import 'package:makenote/views/login_view.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,

@@ -70,7 +70,11 @@ class _LoginViewState extends State<LoginView> {
               ),
             ),
             Container(
-              margin: const EdgeInsets.only(top: 125, left: 20, right: 20),
+              margin: MediaQuery.of(context).size.width > 700
+                  ? EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.25,
+                      vertical: 120)
+                  : const EdgeInsets.only(top: 125, left: 20, right: 20),
               height: 300,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),

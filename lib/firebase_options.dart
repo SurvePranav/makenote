@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -46,31 +47,31 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBpRG-AQ-ONigGH_HurDvPl1DXGycp6fw8',
-    appId: '1:968137639156:web:3fd2dac28add4a7f8f0aa1',
-    messagingSenderId: '968137639156',
-    projectId: 'makenote-flutter-project-de4c0',
-    authDomain: 'makenote-flutter-project-de4c0.firebaseapp.com',
-    storageBucket: 'makenote-flutter-project-de4c0.appspot.com',
-    measurementId: 'G-V5WMG57CDY',
+  static FirebaseOptions web = FirebaseOptions(
+    apiKey: dotenv.env['webApiKey'] ?? '',
+    appId: dotenv.env['webAppId'] ?? '',
+    messagingSenderId: dotenv.env['webMessagingSenderId'] ?? '',
+    projectId: dotenv.env['webProjectId'] ?? '',
+    authDomain: dotenv.env['webAuthDomain'] ?? '',
+    storageBucket: dotenv.env['webStorageBucket'] ?? '',
+    measurementId: dotenv.env['webMeasurementId'] ?? '',
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyD6GgqjoDDdDkCH-S101zKh823zwP-SvZ0',
-    appId: '1:968137639156:android:372af3fb9aea979f8f0aa1',
-    messagingSenderId: '968137639156',
-    projectId: 'makenote-flutter-project-de4c0',
-    storageBucket: 'makenote-flutter-project-de4c0.appspot.com',
+  static FirebaseOptions android = FirebaseOptions(
+    apiKey: dotenv.env['androidApiKey'] ?? '',
+    appId: dotenv.env['androidAppId'] ?? '',
+    messagingSenderId: dotenv.env['androidMessagingSenderId'] ?? '',
+    projectId: dotenv.env['androidProjectId'] ?? '',
+    storageBucket: dotenv.env['androidStorageBucket'] ?? '',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBhBE4Oni-3CV0figHx1Ti-AooNcc29MXQ',
-    appId: '1:968137639156:ios:482e8840f5ec5a8c8f0aa1',
-    messagingSenderId: '968137639156',
-    projectId: 'makenote-flutter-project-de4c0',
-    storageBucket: 'makenote-flutter-project-de4c0.appspot.com',
-    iosClientId: '968137639156-fks4k7b988mi3a0en75e4ubph1fcl00h.apps.googleusercontent.com',
-    iosBundleId: 'com.notemaker.makenote',
+  static FirebaseOptions ios = FirebaseOptions(
+    apiKey: dotenv.env['iosApiKey'] ?? '',
+    appId: dotenv.env['iosAppid'] ?? '',
+    messagingSenderId: dotenv.env['iosMessagingSenderId'] ?? '',
+    projectId: dotenv.env['iosProjectId'] ?? '',
+    storageBucket: dotenv.env['iosStorageBucket'] ?? '',
+    iosClientId: dotenv.env['iosClientId'] ?? '',
+    iosBundleId: dotenv.env['iosBundleId'] ?? '',
   );
 }

@@ -14,6 +14,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text(
           'Verify Email',
           style: TextStyle(
@@ -34,6 +35,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               style: TextStyle(fontSize: 18),
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
                   'email not received?',

@@ -109,115 +109,124 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
 
   @override
   Widget build(BuildContext context) {
-    log('building whole screen');
+    Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Hero(
-                tag: _note?.documentId ?? 'New Note',
-                child: Container(
-                  height: 50,
-                  alignment: Alignment.centerLeft,
-                  margin: const EdgeInsets.only(left: 10),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios,
-                      size: 26,
+          child: Container(
+            margin: screenSize.width > 700
+                ? EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.23,
+                  )
+                : null,
+            child: Column(
+              children: [
+                Hero(
+                  tag: _note?.documentId ?? 'New Note',
+                  child: Container(
+                    height: 50,
+                    alignment: Alignment.centerLeft,
+                    margin: const EdgeInsets.only(left: 10),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios,
+                        size: 26,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
                   ),
                 ),
-              ),
-              Container(
-                margin: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(25),
-                      child: Container(
-                        height: 60,
-                        width: MediaQuery.of(context).size.width * 0.68,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        alignment: Alignment.center,
-                        color: Colors.grey.shade400,
-                        child: TextFormField(
-                          controller: _titleTextController,
-                          cursorColor: Colors.black,
-                          decoration: const InputDecoration.collapsed(
-                            hintText: "Enter Title",
+                Container(
+                  margin: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: Container(
+                          height: 60,
+                          width: screenSize.width > 700
+                              ? screenSize.width * 0.35
+                              : screenSize.width * 0.68,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          alignment: Alignment.center,
+                          color: Colors.grey.shade400,
+                          child: TextFormField(
+                            controller: _titleTextController,
+                            cursorColor: Colors.black,
+                            decoration: const InputDecoration.collapsed(
+                              hintText: "Enter Title",
+                            ),
+                            style: const TextStyle(
+                              fontSize: 27,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            onChanged: (value) async {
+                              if (isFirstTime) {
+                                log('value changed for first time');
+                                _setUpTextControllerListener();
+                                isFirstTime = false;
+                              }
+                            },
+                            onTapOutside: (event) =>
+                                FocusManager.instance.primaryFocus?.unfocus(),
                           ),
-                          style: const TextStyle(
-                            fontSize: 27,
-                            fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.grey.shade400,
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.share,
+                            color: Colors.black,
                           ),
-                          onChanged: (value) async {
-                            if (isFirstTime) {
-                              log('value changed for first time');
-                              _setUpTextControllerListener();
-                              isFirstTime = false;
+                          onPressed: () {
+                            final text = _textController.text;
+                            if (_note == null || text == "") {
+                              cannotShareEmptyNoteDialog(
+                                  context, "Cannot share empty note");
+                            } else {
+                              Share.share(text);
                             }
                           },
-                          onTapOutside: (event) =>
-                              FocusManager.instance.primaryFocus?.unfocus(),
                         ),
                       ),
-                    ),
-                    const Spacer(),
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.grey.shade400,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.share,
-                          color: Colors.black,
-                        ),
-                        onPressed: () {
-                          final text = _textController.text;
-                          if (_note == null || text == "") {
-                            cannotShareEmptyNoteDialog(
-                                context, "Cannot share empty note");
-                          } else {
-                            Share.share(text);
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Colors.grey.shade400,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: TextField(
-                    controller: _textController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      hintText: 'Start typing your note..',
-                    ),
-                    style: const TextStyle(fontSize: 20),
-                    onChanged: (value) async {
-                      if (isFirstTime) {
-                        log('value changed for first time');
-                        _setUpTextControllerListener();
-                        isFirstTime = false;
-                      }
-                    },
-                    onTapOutside: (event) =>
-                        FocusManager.instance.primaryFocus?.unfocus(),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  margin: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.grey.shade400,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: TextField(
+                      controller: _textController,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        hintText: 'Start typing your note..',
+                      ),
+                      style: const TextStyle(fontSize: 20),
+                      onChanged: (value) async {
+                        if (isFirstTime) {
+                          log('value changed for first time');
+                          _setUpTextControllerListener();
+                          isFirstTime = false;
+                        }
+                      },
+                      onTapOutside: (event) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
